@@ -11,7 +11,7 @@
   --gray-300: #D7D7D7;
   --gray-500: #BBBBBB;
   
-  --backgournd: #1A1D23;
+  --background: #1A1D23;
 }
 
 @media (max-width: 1800px) {
@@ -27,7 +27,7 @@
 }
 
 body{
-  background: var(--gray-900);
+  background-color: var(--background);
   color: var(--white);
 }
 
