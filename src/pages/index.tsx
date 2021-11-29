@@ -2,8 +2,8 @@ import { GetStaticProps } from 'next';
 
 import { getPrismicClient } from '../services/prismic';
 import Prismic from "@prismicio/client";
+import { RichText} from "prismic-dom"
 
-import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 
 import { format } from 'date-fns';
@@ -91,7 +91,17 @@ export const getStaticProps = async () => {
     pageSize: 20,
 })
 
-console.log(postResponse)
+  const posts = postResponse.results.map(post => {
+    return{
+      slug: post.uid,
+      title: post.data.slug,
+    }
+  })
+
+
+
+  console.log(posts)
+  console.log(JSON.stringify( postResponse, null, 2))
 
 return{
   props:{}
