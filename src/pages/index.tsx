@@ -9,6 +9,7 @@ import styles from './home.module.scss';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import {FiUser, FiCalendar}  from "react-icons/fi"
+import { previousSunday } from 'date-fns/esm';
 
 format(
 	new Date(),
@@ -37,43 +38,24 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home() {
+export default function Home({postsPagination}: HomeProps ) {
+  console.log(postsPagination)
   return(
     <main className={styles.container}>
 
-        <section>
-          <h2>Como utilizar Hooks </h2>
-          <p>Pensando em sincronização em vez de circulo de vida </p>
+          {postsPagination.results.map(post => (
+         
+         <section key={post.uid}>     
+            <a href="#"> <h2>{post.data.title} </h2> </a>
+            <p>{post.data.subtitle} </p>
 
-          <div className={styles.creator}>
-            <div> <FiCalendar />  29/01/2002 </div>
-            <div> <FiUser /> Davi Serrano</div>
-          </div>
-
-        </section>
-
-        <section>
-          <a href="#"> <h2>Como utilizar Hooks </h2> </a>
-          <p>Pensando em sincronização em vez de circulo de vida </p>
-
-          <div className={styles.creator}>
-            <div> <FiCalendar />  29/01/2002 </div>
-            <div> <FiUser /> Davi Serrano</div>
-          </div>
+            <div className={styles.creator}>
+              <div> <FiCalendar />  {post.first_publication_date} </div>
+              <div> <FiUser /> {post.data.author}</div>
+            </div>
 
         </section>
-
-        <section>
-          <h2>Como utilizar Hooks </h2>
-          <p>Pensando em sincronização em vez de circulo de vida </p>
-
-          <div className={styles.creator}>
-            <div> <FiCalendar />  29/01/2002 </div>
-            <div> <FiUser /> Davi Serrano</div>
-          </div>
-
-        </section>
-
+          ))}
 
         <button>Carregar mais post...</button>
     
@@ -91,20 +73,32 @@ export const getStaticProps = async () => {
     pageSize: 20,
 })
 
-  const posts = postResponse.results.map(post => {
+  const postnextpage = postResponse.next_page;
+
+  const postsPagination = postResponse.results.map(post => {
     return{
-      slug: post.uid,
-      title: post.data.slug,
+      next_page: postnextpage,
+      results: {
+        uid: post.uid,
+        first_publication_date: post.first_publication_date,
+        data: {
+          title: post.data.content[0].heading,
+          subtitle: post.data.content[0].heading,
+          author: post.data.content[0].heading,
+        }
+      }
     }
   })
 
 
 
-  console.log(posts)
+  console.log(postsPagination)
   console.log(JSON.stringify( postResponse, null, 2))
 
 return{
-  props:{}
+  props:{
+    postsPagination
+  }
 }
 
 };
