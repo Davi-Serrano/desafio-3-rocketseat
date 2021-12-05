@@ -56,7 +56,7 @@ export default function Home({postsPagination}: HomeProps ): JSX.Element{
           {posts.map(post => (
          
          <section key={post.uid}>     
-            <a href="#"> <h2>{post.data.title} </h2> </a>
+            <a href={`/post/${post.uid}`}><h2>{post.data.title} </h2> </a>
             <p>{post.data.subtitle} </p>
 
             <div className={styles.creator}>
