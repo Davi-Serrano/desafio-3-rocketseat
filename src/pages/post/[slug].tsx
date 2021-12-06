@@ -5,6 +5,7 @@ import {FiUser, FiCalendar, FiClock}  from "react-icons/fi"
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
+import { RichText } from 'prismic-dom';
 
 interface Post {
   first_publication_date: string | null;
@@ -28,53 +29,46 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
-  console.log(post)
+  
   return(
-        <div className={styles.container}>
-          <div className={styles.image}>
-            <h1>Aqui vai a imagem</h1>
-          </div>
+    <div className={styles.container}>
+         
+            <img className={styles.image} src={post.data.banner.url} alt="imagem" />
+
 
           <article>
 
             <div>
-                <h2>Aqui vai o titulo bla bla bla</h2>
+                <h2>{post.data.title}</h2>
                 
                 <FiUser />
-                <span>15 Mar 2021</span>
+                <span>{post.first_publication_date}</span>
               
                 <FiCalendar />
-                <span>Davi Serrano</span>
+                <span>{post.data.author}</span>
               
                 <FiClock />
                 <span>4min</span>
             </div>
 
-            <div>
-              <h3>Aqui vai o titulo bla bla bla  </h3>
+            {post.data.content.map( content => {
+                return( 
+                      <div>
+                        <h3>{content.heading} </h3>
 
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus nihil numquam pariatur ab modi debitis, vero ipsa porro earum totam sunt, enim accusantium quod alias assumenda eius minus, sit nulla.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis nulla debitis incidunt autem perferendis voluptatem distinctio earum nesciunt, nostrum aperiam recusandae unde, nisi pariatur excepturi vel quasi quod eius asperiores?
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora voluptas ab autem consequatur, doloremque iste ipsum minus accusamus dicta recusandae repellat quasi. Quod officiis nemo amet tempore facere culpa. At!
+                        <div 
+                        dangerouslySetInnerHTML={{
+                          __html: RichText.asHtml(content.body),
+                        }}
+                        >
+                        </div>
+                       
+                      </div> 
+              
+                )
+              })}
 
-              </p>
-
-            </div>  
-
-            <div>
-              <h3>Aqui vai o titulo bla bla bla  </h3>
-
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus nihil numquam pariatur ab modi debitis, vero ipsa porro earum totam sunt, enim accusantium quod alias assumenda eius minus, sit nulla.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis nulla debitis incidunt autem perferendis voluptatem distinctio earum nesciunt, nostrum aperiam recusandae unde, nisi pariatur excepturi vel quasi quod eius asperiores?
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora voluptas ab autem consequatur, doloremque iste ipsum minus accusamus dicta recusandae repellat quasi. Quod officiis nemo amet tempore facere culpa. At!
-
-              </p>
-
-            </div>  
-
-            <div>
-            </div>    
-
+          
 
           </article>
 
@@ -82,7 +76,7 @@ export default function Post({ post }: PostProps) {
   )
 }
 
-export const getStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   // const prismic = getPrismicClient();
   // const posts = await prismic.query(TODO);
 
@@ -92,7 +86,7 @@ export const getStaticPaths = async () => {
   }
 };
 
-export const getStaticProps = async context => {
+export const getStaticProps: GetStaticProps = async context => {
   const prismic = getPrismicClient();
   const { slug } = context.params;
   const response = await prismic.getByUID('posts', String(slug), {});
@@ -109,7 +103,7 @@ export const getStaticProps = async context => {
       },
       content: response.data.content.map(content => {
         return {
-          haeding: content.heading,
+          heading: content.heading,
           body:[...content.body],
         };
       }),
