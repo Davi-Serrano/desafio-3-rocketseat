@@ -1,16 +1,17 @@
 import { GetStaticProps } from 'next';
 
-import { getPrismicClient } from '../services/prismic';
+import React, { useState } from 'react';
+import  Head  from 'next/head';
+
 import Prismic from "@prismicio/client";
+import { getPrismicClient } from '../services/prismic';
 import { RichText} from "prismic-dom"
 
 import styles from './home.module.scss';
+import {FiUser, FiCalendar}  from "react-icons/fi"
 
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
-import {FiUser, FiCalendar}  from "react-icons/fi"
-import { previousSunday } from 'date-fns/esm';
-import { useState } from 'react';
 
 
 
@@ -49,8 +50,48 @@ export default function Home({postsPagination}: HomeProps ): JSX.Element{
   })
 
   const [posts, setPost] = useState<Post[]>(formattedPost);
+  const [nextPage, setNextPage ] = useState(postsPagination.next_page)
+  const [currentPage, setCurrentPage] = useState(1) 
+ 
+ async function handleNextPage(): Promise<void>{
+   if(currentPage != 1 && nextPage === null){
+     return;
+   }
 
+   const postResults = await fetch(`${nextPage}`)
+    .then( response => response.json()
+    );
+
+    setNextPage(postResults.next_page);
+    setCurrentPage(postResults.next_page);
+
+    const newPosts = postResults.results.map(post => {
+      return {
+        uid: post.uid,
+        first_publication_date:format(
+          new Date(post.first_publication_date),
+          "dd MMM yyyy",
+          {
+            locale: ptBR,
+          }
+        ),
+        data: {
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
+        },
+      }
+    })
+
+    setPost([...posts, ...newPosts])
+
+ }
+ 
   return(
+    <>
+      <Head>
+        <title>Home | SpaceTravelling</title>
+      </Head>
     <main className={styles.container}>
 
           {posts.map(post => (
@@ -67,9 +108,13 @@ export default function Home({postsPagination}: HomeProps ): JSX.Element{
         </section>
           ))}
 
-        <button>Carregar mais post...</button>
+        {nextPage && ( <button
+        type="button"
+        onClick={handleNextPage}
+        >Carregar mais posts</button>)}
     
     </main>
+    </>
   )
 }
 
@@ -77,11 +122,11 @@ export const getStaticProps = async () => {
   const prismic = getPrismicClient();
 
   const postResponse = await prismic.query([
-    Prismic.predicates.at('document.type', 'posts')
-],{
-    fetch: ['posts', 'posts.content'],
-    pageSize: 10,
-})
+    Prismic.predicates.at('document.type', 'posts')],
+    {
+      pageSize: 1,
+    }
+);
 
   const posts = postResponse.results.map(post => {
     
@@ -89,9 +134,9 @@ export const getStaticProps = async () => {
         uid: post.uid,
         first_publication_date: post.first_publication_date,
         data: {
-          title: post.data.content[0].heading,
-          subtitle: post.data.content[0].heading,
-          author: post.data.content[0].heading,
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
         },
       };
   });
