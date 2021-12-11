@@ -1,37 +1,63 @@
-.container{
-    margin: auto;
-    max-width: 50vw;
+.postList{
+    article{
+        margin-bottom: 3rem;
 
-    @media (max-width: 720px) {
-        max-width: 100vw;
-    }
+        strong{
+            font-size: 1.75rem;
 
-    
-    section{
-        color: var(--gray-500);
-        padding: 2rem 0;
-    
-        h2{
-            color: var(--white);
+            transition-property: margin-left , font-size, color;
+            transition: .4s;
+        }
+
+        p{
+            margin-top: .5rem;    
+            
+            transition-property: margin-left , font-size, color;
+            transition: .5s;
+        }
+
+        & > div{
+            display: flex;
+            gap: 3rem;
+
+            margin-top: 1.8rem; 
+            
+            time{
+                display: flex;
+                align-items: center;
+                gap: .8rem;
+
+                color: var(--info);
+            }
+            span{
+                display: flex;
+                align-items: center;
+                gap: .8rem;
+
+                color: var(--info);
+            }
+        }
+
+        & + article{
+            margin-top: 2.5rem;
+        }
+
+        &:hover strong{
+            transform: translateX(5px);
+            font-size: 1.76rem;
+            color: var(--highlight);
+        }
+
+        &:hover p{
+            transform: translateX(10px);
+            font-size: 1rem;
+            color: var(--heading);
         }
     }
-
-    button{
-        background: none;
-        color: var(--pink);
-        font-weight: bold;
-        border: none;
-    }
-
 }
 
-.creator{
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    font-size: 0.9rem;
-    
-    div:last-child{
-        padding-left: 1rem;
-    }
+.loadMore{
+    margin-bottom: 2rem;
+    font-size: 1.05rem;
+    font-weight: 600;
 }
